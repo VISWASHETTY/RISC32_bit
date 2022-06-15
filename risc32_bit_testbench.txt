@@ -1,0 +1,43 @@
+module tb();
+    reg clk;
+    integer k;
+    risc_32 dut(clk);
+   
+    initial
+        begin
+            clk=0;      
+        end
+    always
+    begin
+        #5 clk = ~clk;
+        end
+   
+    initial
+    begin
+    for (k=0; k<=31; k = k+1) dut.regb[k] <= k;
+    dut.mem[0] <= 32'h84200005; // r1 = r0 + 5 = 5   1000 0100 0010 0000 0000 0000 0000 0101
+    dut.mem[1] <= 32'h8440000a; // r2 = r0 + 10 = 10  1000 0100 0100 0000 0000 0000 0000 1010
+    dut.mem[2] <= 32'h8460000f; // r3 = r0 + 15 = 15
+    dut.mem[3] <= 32'h84800014; // r4 = r0 + 20 = 20
+    dut.mem[4] <= 32'h84a00019; // r5 = r0 + 25 = 25
+    dut.mem[5] <= 32'h00c11000; // r6 = r1 + r2 = 15  0000 0000 1100 0001 0001 0000 0000 0000
+    dut.mem[6] <= 32'h04e31000; // r7 = r3 - r2 = 5
+    dut.mem[7] <= 32'h0d040800; // r8 = r4 / r1 = 4
+    
+    dut.halted <= 0;
+    dut.pc <= 0;
+    
+    $monitor("r0 - %d",dut.regb[0]);
+    $monitor("r1 - %d",dut.regb[1]);
+    $monitor("r2 - %d",dut.regb[2]);
+    $monitor("r3 - %d",dut.regb[3]);
+    $monitor("r4 - %d",dut.regb[4]);
+    $monitor("r5 - %d",dut.regb[5]);
+    $monitor("r6 - %d",dut.regb[6]);
+    $monitor("r7 - %d",dut.regb[7]);
+    $monitor("r8 - %d",dut.regb[8]);
+    
+    $monitor("op-cd = %b, A = %b, B = %b, IMM = %b, aluout = %b datamem[0] = %b", dut.id_ex_opcd, dut.id_ex_a, dut.id_ex_b, dut.id_ex_imm, dut.ex_mem_aluout, dut.datamem[0]);
+    #1000 $finish;
+    end
+endmodule
